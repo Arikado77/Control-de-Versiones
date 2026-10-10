@@ -1,17 +1,22 @@
+/*export default function TaskEdit() {
+  return <h2>Editar tarea</h2>;
+}*/
+
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client';
-import TaskPriorityBadge from '../components/TaskPriorityBadge';
-import TaskPrioritySelect from '../components/TaskPrioritySelect';
-import TaskStatusBadge from '../components/TaskStatusBadge';
-import TaskStatusSelect from '../components/TaskStatusSelect';
-import { ESTADO_DEFAULT, PRIORIDAD_DEFAULT } from '../constants/taskOptions';
-import '../components/taskMeta.css';
 
 export default function TaskEdit() {
   const { id } = useParams();
-  const [estado, setEstado] = useState(ESTADO_DEFAULT);
-  const [prioridad, setPrioridad] = useState(PRIORIDAD_DEFAULT);
+  const navigate = useNavigate();
+
+  const [formulario, setFormulario] = useState({
+    titulo: '',
+    descripcion: '',
+    estado: 'Pendiente',
+    prioridad: 'Media'
+  });
+
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState('');
@@ -20,71 +25,147 @@ export default function TaskEdit() {
   useEffect(() => {
     let activo = true;
 
-    api(`/tasks/${id}`)
-      .then((tarea) => {
-        if (!activo || !tarea) return;
-        if (tarea.estado) setEstado(tarea.estado);
-        if (tarea.prioridad) setPrioridad(tarea.prioridad);
-        setError('');
-      })
-      .catch((err) => {
+    async function cargarTarea() {
+      try {
+        const tarea = await api(`/tasks/${id}`);
+
         if (!activo) return;
-        const detalle = err.message === 'No implementado'
-          ? 'Todavía no se puede consultar la tarea. Se muestran los valores predeterminados.'
-          : err.message;
-        setError(detalle || 'No se pudo consultar la tarea');
-      })
-      .finally(() => {
+
+        setFormulario({
+          titulo: tarea.titulo ?? '',
+          descripcion: tarea.descripcion ?? '',
+          estado: tarea.estado ?? 'Pendiente',
+          prioridad: tarea.prioridad ?? 'Media'
+        });
+      } catch (err) {
+        if (activo) setError(err.message);
+      } finally {
         if (activo) setCargando(false);
-      });
+      }
+    }
+
+    cargarTarea();
 
     return () => {
       activo = false;
     };
   }, [id]);
 
-  async function guardar(event) {
-    event.preventDefault();
-    setGuardando(true);
-    setMensaje('');
+  function manejarCambio(e) {
+    const { name, value } = e.target;
+
+    setFormulario(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+
+  async function guardarCambios(e) {
+    e.preventDefault();
     setError('');
+    setMensaje('');
+
+    if (!formulario.titulo.trim()) {
+      setError('El título es obligatorio');
+      return;
+    }
+
+    setGuardando(true);
 
     try {
-      const tarea = await api(`/tasks/${id}`, {
+      await api(`/tasks/${id}`, {
         method: 'PUT',
-        body: JSON.stringify({ estado, prioridad }),
+        body: JSON.stringify(formulario)
       });
-      if (tarea?.estado) setEstado(tarea.estado);
-      if (tarea?.prioridad) setPrioridad(tarea.prioridad);
-      setMensaje('Estado y prioridad actualizados');
+
+      setMensaje('Tarea modificada correctamente');
+
+      setTimeout(() => {
+        navigate('/');
+      }, 1000);
     } catch (err) {
-      setError(err.message || 'No se pudo actualizar la tarea');
+      setError(err.message);
     } finally {
       setGuardando(false);
     }
   }
 
+  if (cargando) {
+    return <p>Cargando tarea...</p>;
+  }
+
   return (
-    <>
-      <h2>Editar tarea</h2>
-      <form className="task-meta" onSubmit={guardar}>
-        <TaskStatusSelect value={estado} onChange={setEstado} disabled={guardando} />
-        <TaskPrioritySelect value={prioridad} onChange={setPrioridad} disabled={guardando} />
-        <div className="task-meta-preview">
-          <TaskStatusBadge estado={estado} />
-          <TaskPriorityBadge prioridad={prioridad} />
+    <div style={{ maxWidth: '600px', margin: '40px auto' }}>
+      <h2>Modificar tarea</h2>
+
+      {error && <p role="alert" style={{ color: 'red' }}>{error}</p>}
+      {mensaje && <p role="status" style={{ color: 'green' }}>{mensaje}</p>}
+
+      <form onSubmit={guardarCambios}>
+        <div>
+          <label htmlFor="titulo">Título</label>
+          <input
+            id="titulo"
+            type="text"
+            name="titulo"
+            value={formulario.titulo}
+            onChange={manejarCambio}
+            required
+          />
         </div>
-        <button type="submit" disabled={cargando || guardando}>
-          {guardando ? 'Guardando…' : 'Guardar estado y prioridad'}
-        </button>
-        {cargando && <p className="task-meta-msg">Cargando tarea…</p>}
-        {mensaje && <p className="task-meta-msg">{mensaje}</p>}
-        {error && (
-          <p className="task-meta-msg task-meta-error" role="alert">
-            {error}
-          </p>
-        )}
+
+        <div>
+          <label htmlFor="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            value={formulario.descripcion}
+            onChange={manejarCambio}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="estado">Estado</label>
+          <select
+            id="estado"
+            name="estado"
+            value={formulario.estado}
+            onChange={manejarCambio}
+          >
+            <option value="Pendiente">Pendiente</option>
+            <option value="En proceso">En proceso</option>
+            <option value="Terminada">Terminada</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="prioridad">Prioridad</label>
+          <select
+            id="prioridad"
+            name="prioridad"
+            value={formulario.prioridad}
+            onChange={manejarCambio}
+          >
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+          </select>
+        </div>
+
+        <div style={{ marginTop: '20px' }}>
+          <button type="submit" disabled={guardando}>
+            {guardando ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            style={{ marginLeft: '10px' }}
+          >
+            Cancelar
+          </button>
+        </div>
       </form>
-    </>
+    </div>
   );
 }
