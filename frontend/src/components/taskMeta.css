@@ -1,0 +1,144 @@
+.task-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  width: min(100% - 32px, 440px);
+  margin: 24px auto 40px;
+  text-align: left;
+}
+
+.task-meta label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.task-meta select,
+.task-meta button {
+  font: inherit;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  padding: 8px 10px;
+}
+
+.task-meta button {
+  cursor: pointer;
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.task-meta button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.task-meta-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.badge-estado-pendiente {
+  color: #92400e;
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.badge-estado-en-proceso {
+  color: #1e40af;
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.badge-estado-terminada {
+  color: #166534;
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.badge-prioridad-baja {
+  color: #3f3f46;
+  background: #f4f4f5;
+  border-color: #d4d4d8;
+}
+
+.badge-prioridad-media {
+  color: #9a3412;
+  background: #ffedd5;
+  border-color: #fdba74;
+}
+
+.badge-prioridad-alta {
+  color: #991b1b;
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.badge-desconocido {
+  color: #7f1d1d;
+  background: #fff1f2;
+  border-color: #fb7185;
+}
+
+.task-meta-msg {
+  margin: 0;
+  font-size: 14px;
+}
+
+.task-meta-error {
+  color: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+  .badge-estado-pendiente {
+    color: #fde68a;
+    background: #451a03;
+    border-color: #d97706;
+  }
+
+  .badge-estado-en-proceso {
+    color: #bfdbfe;
+    background: #1e3a8a;
+    border-color: #60a5fa;
+  }
+
+  .badge-estado-terminada {
+    color: #bbf7d0;
+    background: #14532d;
+    border-color: #4ade80;
+  }
+
+  .badge-prioridad-baja {
+    color: #e4e4e7;
+    background: #27272a;
+    border-color: #71717a;
+  }
+
+  .badge-prioridad-media {
+    color: #fed7aa;
+    background: #7c2d12;
+    border-color: #fb923c;
+  }
+
+  .badge-prioridad-alta {
+    color: #fecaca;
+    background: #7f1d1d;
+    border-color: #f87171;
+  }
+}

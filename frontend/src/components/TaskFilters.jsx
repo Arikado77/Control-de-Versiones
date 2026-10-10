@@ -77,12 +77,12 @@ export default function TaskFilters({
       </label>
 
       <button type="button" onClick={onLimpiar} disabled={deshabilitado || sinFiltros}>
-        Limpiar filtros
+        Limpiar
       </button>
 
-      {cargando && <p className="task-filters-msg">Cargando responsables…</p>}
+      {cargando && <p className="task-filters-note">Cargando responsables…</p>}
       {error && (
-        <p className="task-filters-msg task-filters-error" role="alert">
+        <p className="task-filters-error" role="alert">
           {error}
         </p>
       )}
