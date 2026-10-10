@@ -7,6 +7,7 @@ import TaskStatusBadge from '../components/TaskStatusBadge';
 import TaskStatusSelect from '../components/TaskStatusSelect';
 import { ESTADO_DEFAULT, PRIORIDAD_DEFAULT } from '../constants/taskOptions';
 import '../components/taskMeta.css';
+import './taskCreate.css';
 
 export default function TaskCreate() {
   const navigate = useNavigate();
@@ -38,47 +39,70 @@ export default function TaskCreate() {
   };
 
   return (
-    <div>
-      <h2>Nueva tarea</h2>
-      <form className="task-meta" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="titulo">Título</label>
-          <br />
+    <section className="task-create">
+      <header className="task-create-head">
+        <p className="task-create-eyebrow">Registro</p>
+        <h2>Nueva tarea</h2>
+        <p>Escribe el título, una nota breve y elige el estado y la prioridad con los que entra al tablero.</p>
+      </header>
+
+      <form className="task-create-card" onSubmit={handleSubmit}>
+        <label htmlFor="titulo">
+          Título
           <input
             id="titulo"
             name="titulo"
             value={form.titulo}
             onChange={handleChange}
+            placeholder="Ejemplo: Revisar el informe del viernes"
             required
             disabled={saving}
           />
-        </div>
-        <div>
-          <label htmlFor="descripcion">Descripción</label>
-          <br />
+        </label>
+
+        <label htmlFor="descripcion">
+          Descripción
           <textarea
             id="descripcion"
             name="descripcion"
             value={form.descripcion}
             onChange={handleChange}
+            placeholder="Qué hay que hacer y cualquier detalle que el equipo deba saber."
             disabled={saving}
           />
+        </label>
+
+        <div className="task-create-grid">
+          <TaskStatusSelect value={estado} onChange={setEstado} disabled={saving} />
+          <TaskPrioritySelect value={prioridad} onChange={setPrioridad} disabled={saving} />
         </div>
-        <TaskStatusSelect value={estado} onChange={setEstado} disabled={saving} />
-        <TaskPrioritySelect value={prioridad} onChange={setPrioridad} disabled={saving} />
-        <div className="task-meta-preview">
+
+        <div className="task-create-preview">
+          <span className="task-create-preview-label">Así se verá</span>
           <TaskStatusBadge estado={estado} />
           <TaskPriorityBadge prioridad={prioridad} />
         </div>
+
         {error && (
-          <p className="task-meta-msg task-meta-error" role="alert">
+          <p className="task-create-error" role="alert">
             {error}
           </p>
         )}
-        <button type="submit" disabled={saving}>
-          {saving ? 'Guardando...' : 'Guardar tarea'}
-        </button>
+
+        <div className="task-create-actions">
+          <button type="submit" disabled={saving}>
+            {saving ? 'Guardando...' : 'Guardar tarea'}
+          </button>
+          <button
+            type="button"
+            className="task-create-cancel"
+            onClick={() => navigate('/')}
+            disabled={saving}
+          >
+            Cancelar
+          </button>
+        </div>
       </form>
-    </div>
+    </section>
   );
 }
