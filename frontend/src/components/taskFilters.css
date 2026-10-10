@@ -1,0 +1,80 @@
+.task-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  width: min(100% - 32px, 760px);
+  margin: 24px auto;
+  text-align: left;
+}
+
+.task-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.task-filters select,
+.task-filters button {
+  font: inherit;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  padding: 8px 10px;
+}
+
+.task-filters button {
+  cursor: pointer;
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.task-filters button:disabled,
+.task-filters select:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.task-filters-msg {
+  width: min(100% - 32px, 760px);
+  margin: 0 auto 12px;
+  text-align: left;
+  font-size: 15px;
+}
+
+.task-filters-error {
+  color: #b91c1c;
+}
+
+.task-filters-list {
+  width: min(100% - 32px, 760px);
+  margin: 0 auto 40px;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.task-filters-list li {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 1fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.task-filters-list .sin-responsable {
+  color: var(--text);
+  font-style: italic;
+}
+
+@media (max-width: 700px) {
+  .task-filters-list li {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
