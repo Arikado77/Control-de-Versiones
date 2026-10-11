@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import TaskFilters from '../components/TaskFilters';
 import '../components/taskFilters.css';
@@ -16,6 +17,7 @@ export default function TaskList() {
   const [tareas, setTareas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [eliminandoId, setEliminandoId] = useState(null);
 
   function cambiarEstado(valor) {
     setCargando(true);
@@ -34,6 +36,22 @@ export default function TaskList() {
     setError('');
     setEstado('Todas');
     setResponsableId('');
+  }
+
+  async function eliminarTarea(id) {
+    if (!window.confirm('¿Eliminar esta tarea?')) return;
+
+    setError('');
+    setEliminandoId(id);
+
+    try {
+      await api(`/tasks/${id}`, { method: 'DELETE' });
+      setTareas((prev) => prev.filter((tarea) => tarea.id !== id));
+    } catch (err) {
+      setError(err.message || 'No se pudo eliminar la tarea');
+    } finally {
+      setEliminandoId(null);
+    }
   }
 
   useEffect(() => {
@@ -114,10 +132,11 @@ export default function TaskList() {
         </div>
       )}
 
-      {!cargando && !error && cantidad > 0 && (
+      {!cargando && cantidad > 0 && (
         <ul className="task-filters-list">
           {tareas.map((tarea) => {
             const nombre = tarea.responsable?.nombre;
+            const ocupado = eliminandoId === tarea.id;
             return (
               <li key={tarea.id} className="task-card">
                 <div>
@@ -128,6 +147,12 @@ export default function TaskList() {
                 <span className={nombre ? 'responsable' : 'responsable sin-responsable'}>
                   {nombre || 'Sin responsable'}
                 </span>
+                <div className="task-actions">
+                  <Link to={`/editar/${tarea.id}`}>Modificar</Link>
+                  <button type="button" onClick={() => eliminarTarea(tarea.id)} disabled={ocupado}>
+                    {ocupado ? 'Eliminando…' : 'Eliminar'}
+                  </button>
+                </div>
               </li>
             );
           })}

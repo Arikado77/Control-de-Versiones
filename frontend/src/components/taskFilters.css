@@ -115,13 +115,51 @@
 
 .task-card {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) auto minmax(140px, 0.8fr);
+  grid-template-columns: minmax(0, 1.5fr) auto minmax(140px, 0.8fr) auto;
   gap: 16px;
   align-items: center;
   padding: 18px 20px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 18px;
+}
+
+.task-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.task-actions a,
+.task-actions button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 36px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.task-actions a:hover,
+.task-actions button:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.task-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.task-actions a:focus-visible,
+.task-actions button:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
 }
 
 .task-card strong {
