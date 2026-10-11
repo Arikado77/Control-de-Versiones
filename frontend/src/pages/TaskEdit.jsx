@@ -1,10 +1,13 @@
-/*export default function TaskEdit() {
-  return <h2>Editar tarea</h2>;
-}*/
-
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client';
+import TaskPriorityBadge from '../components/TaskPriorityBadge';
+import TaskPrioritySelect from '../components/TaskPrioritySelect';
+import TaskStatusBadge from '../components/TaskStatusBadge';
+import TaskStatusSelect from '../components/TaskStatusSelect';
+import { ESTADO_DEFAULT, PRIORIDAD_DEFAULT } from '../constants/taskOptions';
+import '../components/taskMeta.css';
+import './taskCreate.css';
 
 export default function TaskEdit() {
   const { id } = useParams();
@@ -13,8 +16,8 @@ export default function TaskEdit() {
   const [formulario, setFormulario] = useState({
     titulo: '',
     descripcion: '',
-    estado: 'Pendiente',
-    prioridad: 'Media'
+    estado: ESTADO_DEFAULT,
+    prioridad: PRIORIDAD_DEFAULT,
   });
 
   const [cargando, setCargando] = useState(true);
@@ -34,8 +37,8 @@ export default function TaskEdit() {
         setFormulario({
           titulo: tarea.titulo ?? '',
           descripcion: tarea.descripcion ?? '',
-          estado: tarea.estado ?? 'Pendiente',
-          prioridad: tarea.prioridad ?? 'Media'
+          estado: tarea.estado ?? ESTADO_DEFAULT,
+          prioridad: tarea.prioridad ?? PRIORIDAD_DEFAULT,
         });
       } catch (err) {
         if (activo) setError(err.message);
@@ -54,9 +57,9 @@ export default function TaskEdit() {
   function manejarCambio(e) {
     const { name, value } = e.target;
 
-    setFormulario(prev => ({
+    setFormulario((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   }
 
@@ -75,7 +78,7 @@ export default function TaskEdit() {
     try {
       await api(`/tasks/${id}`, {
         method: 'PUT',
-        body: JSON.stringify(formulario)
+        body: JSON.stringify(formulario),
       });
 
       setMensaje('Tarea modificada correctamente');
@@ -90,82 +93,91 @@ export default function TaskEdit() {
     }
   }
 
-  if (cargando) {
-    return <p>Cargando tarea...</p>;
-  }
-
   return (
-    <div style={{ maxWidth: '600px', margin: '40px auto' }}>
-      <h2>Modificar tarea</h2>
+    <section className="task-create">
+      <header className="task-create-head">
+        <p className="task-create-eyebrow">Edición</p>
+        <h2>Modificar tarea</h2>
+        <p>
+          {cargando
+            ? 'Cargando tarea...'
+            : 'Actualiza el título, la nota, el estado o la prioridad. El cambio se guarda en la misma tarea.'}
+        </p>
+      </header>
 
-      {error && <p role="alert" style={{ color: 'red' }}>{error}</p>}
-      {mensaje && <p role="status" style={{ color: 'green' }}>{mensaje}</p>}
+      {!cargando && (
+        <form className="task-create-card" onSubmit={guardarCambios}>
+          <label htmlFor="titulo">
+            Título
+            <input
+              id="titulo"
+              type="text"
+              name="titulo"
+              value={formulario.titulo}
+              onChange={manejarCambio}
+              placeholder="Ejemplo: Revisar el informe del viernes"
+              required
+              disabled={guardando}
+            />
+          </label>
 
-      <form onSubmit={guardarCambios}>
-        <div>
-          <label htmlFor="titulo">Título</label>
-          <input
-            id="titulo"
-            type="text"
-            name="titulo"
-            value={formulario.titulo}
-            onChange={manejarCambio}
-            required
-          />
-        </div>
+          <label htmlFor="descripcion">
+            Descripción
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              value={formulario.descripcion}
+              onChange={manejarCambio}
+              placeholder="Qué hay que hacer y cualquier detalle que el equipo deba saber."
+              disabled={guardando}
+            />
+          </label>
 
-        <div>
-          <label htmlFor="descripcion">Descripción</label>
-          <textarea
-            id="descripcion"
-            name="descripcion"
-            value={formulario.descripcion}
-            onChange={manejarCambio}
-          />
-        </div>
+          <div className="task-create-grid">
+            <TaskStatusSelect
+              value={formulario.estado}
+              onChange={(valor) => setFormulario((prev) => ({ ...prev, estado: valor }))}
+              disabled={guardando}
+            />
+            <TaskPrioritySelect
+              value={formulario.prioridad}
+              onChange={(valor) => setFormulario((prev) => ({ ...prev, prioridad: valor }))}
+              disabled={guardando}
+            />
+          </div>
 
-        <div>
-          <label htmlFor="estado">Estado</label>
-          <select
-            id="estado"
-            name="estado"
-            value={formulario.estado}
-            onChange={manejarCambio}
-          >
-            <option value="Pendiente">Pendiente</option>
-            <option value="En proceso">En proceso</option>
-            <option value="Terminada">Terminada</option>
-          </select>
-        </div>
+          <div className="task-create-preview">
+            <span className="task-create-preview-label">Así se verá</span>
+            <TaskStatusBadge estado={formulario.estado} />
+            <TaskPriorityBadge prioridad={formulario.prioridad} />
+          </div>
 
-        <div>
-          <label htmlFor="prioridad">Prioridad</label>
-          <select
-            id="prioridad"
-            name="prioridad"
-            value={formulario.prioridad}
-            onChange={manejarCambio}
-          >
-            <option value="Baja">Baja</option>
-            <option value="Media">Media</option>
-            <option value="Alta">Alta</option>
-          </select>
-        </div>
+          {error && (
+            <p className="task-create-error" role="alert">
+              {error}
+            </p>
+          )}
+          {mensaje && (
+            <p className="task-create-success" role="status">
+              {mensaje}
+            </p>
+          )}
 
-        <div style={{ marginTop: '20px' }}>
-          <button type="submit" disabled={guardando}>
-            {guardando ? 'Guardando...' : 'Guardar cambios'}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            style={{ marginLeft: '10px' }}
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </div>
+          <div className="task-create-actions">
+            <button type="submit" disabled={guardando}>
+              {guardando ? 'Guardando...' : 'Guardar cambios'}
+            </button>
+            <button
+              type="button"
+              className="task-create-cancel"
+              onClick={() => navigate('/')}
+              disabled={guardando}
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      )}
+    </section>
   );
 }

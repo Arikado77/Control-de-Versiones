@@ -107,13 +107,22 @@
   font-weight: 650;
 }
 
-.task-create-error {
+.task-create-error,
+.task-create-success {
   margin: 0;
   padding: 12px 14px;
   border-radius: 12px;
+  font-size: 14px;
+}
+
+.task-create-error {
   background: #fef2f2;
   color: #b42318;
-  font-size: 14px;
+}
+
+.task-create-success {
+  background: #dcfce7;
+  color: #166534;
 }
 
 .task-create-actions {
@@ -164,6 +173,11 @@
   .task-create-error {
     background: #3f1d1d;
     color: #fca5a5;
+  }
+
+  .task-create-success {
+    background: #14532d;
+    color: #bbf7d0;
   }
 
   .task-create-card select {
